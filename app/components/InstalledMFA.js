@@ -22,17 +22,40 @@ export default class InstalledMFA extends React.Component {
     var secret = this.props.mfa.content.secret;
     var url = Util.generateQrCodeUrl(secret);
     var otp = Util.getOtp(secret);
-    return (
-      <div>
-        <p>Your key: {secret}</p>
-        <p>URL: {url}</p>
-        <p>OTP: {otp}</p>
-        <QRCode value={url}/>
-        <div style={{marginTop: 10}}>
-          <button onClick={this.uninstall}>Uninstall</button>
+    return [
+      <div className="panel-section no-border no-bottom-pad">
+        <p>
+          2FA is enabled. You can disable 2FA by pressing Uninstall below.
+        </p>
+      </div>,
+      <div className="panel-section">
+          <h1 className="panel-row outer-title"><strong>Google Authenticator</strong></h1>
+
+        <div className="panel-row justify-left align-top">
+
+          <div className="panel-column">
+            <QRCode value={url}/>
+            <div className="panel-row button-group stretch">
+              <div className="button danger" onClick={this.uninstall}>
+                <div className="label">Uninstall</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="panel-column right-section">
+
+            <p className="panel-row justify-left multi-label">
+              Secret Key
+              <strong>{secret}</strong>
+            </p>
+            <p className="panel-row justify-left multi-label">
+              Current Token
+              <strong>{otp}</strong>
+            </p>
+          </div>
         </div>
       </div>
-    )
+    ]
   }
 
 }

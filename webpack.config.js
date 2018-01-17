@@ -4,24 +4,36 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const uglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 
+const extractText = new ExtractTextPlugin({ filename: './dist.css'});
+
 module.exports = {
-  devtool: 'cheap-source-map',
-  entry: [
-    path.resolve(__dirname, 'app/main.js'),
-    path.resolve(__dirname, 'app/stylesheets/main.scss'),
-  ],
+  entry: {
+    "dist.js" : path.resolve(__dirname, 'app/main.js'),
+    "dist.min.js" : path.resolve(__dirname, 'app/main.js'),
+    "dist.css" : path.resolve(__dirname, 'app/stylesheets/main.scss'),
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
-    filename: './dist.js'
+    filename: './[name]'
+  },
+  devServer: {
+    historyApiFallback: true,
+    watchOptions: { aggregateTimeout: 300, poll: 1000 },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    }
   },
   module: {
     loaders: [
       { test: /\.css$/, include: path.resolve(__dirname, 'app'), loader: 'style-loader!css-loader' },
+
       {
         test: /\.scss$/,
         exclude: /node_modules/,
-        use: ExtractTextPlugin.extract({
+        use: extractText.extract({
           fallback: 'style-loader',
           use: [
             'css-loader',
@@ -30,6 +42,7 @@ module.exports = {
           publicPath: '../'
         }),
       },
+
       { test: /\.js[x]?$/, include: [
         path.resolve(__dirname, 'app'),
         path.resolve(__dirname, 'node_modules/sn-components-api/dist/dist.js')
@@ -37,14 +50,16 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.css', '.scss'],
+    alias: {
+        stylekit: path.join(__dirname, 'node_modules/sn-stylekit/dist/stylekit.css')
+    }
   },
   plugins: [
-    new ExtractTextPlugin({ filename: './dist.css', disable: false, allChunks: true}),
+    extractText,
     new uglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
+      include: /\.min\.js$/,
+      minimize: true
     }),
     new webpack.DefinePlugin({
       'process.env': {
@@ -52,7 +67,7 @@ module.exports = {
       }
     }),
     new CopyWebpackPlugin([
-      { from: './app/index.html', to: 'index.html' },
+      { from: './app/index.html', to: 'index.html' }
     ])
   ]
 };

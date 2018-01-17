@@ -1,7 +1,49 @@
 body {
-  font-size: 16px;
+  font-size: 17px;
   font-family: sans-serif;
-  margin: 15px;
   width: 100%;
   height: 100%;
+  color: black;
+  user-select: inherit !important;
+  padding: 0;
+  margin: 0;
 }
+
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+p {
+  color: black !important;
+}
+
+.left-section {
+
+}
+
+.right-section {
+  padding-left: 20px;
+}
+
+.multi-label {
+  strong {
+    margin-left: 14px;
+  }
+}
+
+ol {
+  margin-top: 0.4rem;
+  li {
+    margin-bottom: 8px;
+    p {
+      margin-bottom: 5px !important;
+    }
+  }
+}
+
+ol, ol li { margin-left: 0; padding-left: 0; }
+ol { margin-left: 1.3em; }
+
+@import '~stylekit';

@@ -11,7 +11,6 @@ export default class Home extends React.Component {
     BridgeManager.get().initiateBridge();
     BridgeManager.get().addUpdateObserver(() => {
       var installed = BridgeManager.get().getInstalledMfa();
-      console.log("Instaleld MFA", installed);
       if(installed) {
         this.setState({installedMfa: installed, secret: null});
       } else {
@@ -25,14 +24,16 @@ export default class Home extends React.Component {
   render() {
     var mfa = this.state.installedMfa;
     return (
-      <div>
-        {mfa &&
-          <InstalledMFA mfa={mfa} />
-        }
+      <div className="panel static">
+        <div className="content">
+            {mfa &&
+              <InstalledMFA mfa={mfa} />
+            }
 
-        {!mfa &&
-          <NewMFA />
-        }
+            {!mfa &&
+              <NewMFA />
+            }
+          </div>
       </div>
     )
   }

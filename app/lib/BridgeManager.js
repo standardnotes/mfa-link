@@ -15,29 +15,29 @@ export default class BridgeManager {
   }
 
   initiateBridge() {
-    var permissions = [
-      {
-        // name: "stream-context-item"
-        name: "stream-items",
-        content_types: ["SF|MFA"]
-      }
-    ]
+    // var permissions = [
+    //   {
+    //     // name: "stream-context-item"
+    //     name: "stream-items",
+    //     content_types: ["SF|MFA"]
+    //   }
+    // ]
 
-    this.componentManager = new ComponentManager(permissions, () => {
-      console.log("GoogleAuth Ready");
-      console.log("Setting size.");
-      this.componentManager.setSize("container", 500, 300);
-      // on ready
+    this.componentManager = new ComponentManager([], () => {
+
     });
 
     this.componentManager.streamItems(["SF|MFA"], (items) => {
       for(var item of items) {
         if(item.deleted) {
-          this.items.splice(this.items.indexOf(this.itemForId(item.uuid)), 1);
+          this.removeItemFromItems(item);
           continue;
         }
-        if(item.isMetadataUpdate) { continue; }
-        var index = this.items.indexOf(item);
+        if(item.isMetadataUpdate) {
+          continue;
+        }
+
+        var index = this.indexOfItem(item);
         if(index >= 0) {
           this.items[index] = item;
         } else {
@@ -45,10 +45,33 @@ export default class BridgeManager {
         }
       }
 
-      for(var observer of this.updateObservers) {
-        observer.callback();
+      this.notifyObserversOfUpdate();
+
+      if(this.getInstalledMfa()) {
+        this.componentManager.setSize("container", 725, 425);
+      } else {
+        this.componentManager.setSize("container", 725, 625);
       }
     });
+  }
+
+  removeItemFromItems(item) {
+    this.items = this.items.filter((candidate) => {return candidate.uuid !== item.uuid});
+  }
+
+  notifyObserversOfUpdate() {
+    for(var observer of this.updateObservers) {
+      observer.callback();
+    }
+  }
+
+  indexOfItem(item) {
+    for(var index in this.items) {
+      if(this.items[index].uuid == item.uuid) {
+        return index;
+      }
+    }
+    return -1;
   }
 
   getInstalledMfa() {
@@ -60,7 +83,6 @@ export default class BridgeManager {
   }
 
   installMfa(secret) {
-    console.log("Installing mfa", secret);
     this.componentManager.createItem({
       content_type: "SF|MFA",
       content: {
@@ -68,7 +90,6 @@ export default class BridgeManager {
         secret: secret
       }
     }, (item) => {
-      console.log("GA created item", item);
     });
   }
 
