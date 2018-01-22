@@ -1,5 +1,5 @@
 {
-  "name": "sn-prolink",
+  "name": "sn-mfa-link",
   "version": "1.0.0",
   "main": "dist/dist.js",
   "scripts": {
@@ -8,12 +8,6 @@
     "build": "webpack",
     "start": "webpack-dev-server --devtool eval --progress --hot --content-base app",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
-  },
-  "dependencies": {
-    "hi-base32": "^0.3.0",
-    "jssha": "^2.3.1",
-    "qrcode.react": "^0.7.2",
-    "sn-stylekit": "^1.0.114"
   },
   "devDependencies": {
     "babel-core": "6.x",
@@ -44,10 +38,14 @@
     "react": "16.x",
     "react-dom": "^16.2.0",
     "sass-loader": "^6.0.6",
-    "sn-components-api": "1.0.17",
+    "sn-components-api": "1.0.24",
     "style-loader": "~0.13.1",
     "validate-commit-msg": "2.x",
     "webpack": "^3.8.1",
-    "webpack-dev-server": "^2.9.7"
+    "webpack-dev-server": "^2.9.7",
+    "hi-base32": "^0.3.0",
+    "jssha": "^2.3.1",
+    "qrcode.react": "^0.7.2",
+    "sn-stylekit": "^1.0.1193"
   }
 }
