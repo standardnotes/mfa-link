@@ -166,15 +166,9 @@ var BridgeManager = function () {
     value: function initiateBridge() {
       var _this = this;
 
-      // var permissions = [
-      //   {
-      //     // name: "stream-context-item"
-      //     name: "stream-items",
-      //     content_types: ["SF|MFA"]
-      //   }
-      // ]
-
-      this.componentManager = new _snComponentsApi2.default([], function () {});
+      this.componentManager = new _snComponentsApi2.default([], function () {
+        _this.updateSize();
+      });
 
       this.componentManager.streamItems(["SF|MFA"], function (items) {
         var _iteratorNormalCompletion = true;
@@ -216,13 +210,17 @@ var BridgeManager = function () {
         }
 
         _this.notifyObserversOfUpdate();
-
-        if (_this.getInstalledMfa()) {
-          _this.componentManager.setSize("container", 725, 425);
-        } else {
-          _this.componentManager.setSize("container", 725, 625);
-        }
+        _this.updateSize();
       });
+    }
+  }, {
+    key: "updateSize",
+    value: function updateSize() {
+      if (this.getInstalledMfa()) {
+        this.componentManager.setSize("container", 725, 425);
+      } else {
+        this.componentManager.setSize("container", 725, 625);
+      }
     }
   }, {
     key: "removeItemFromItems",

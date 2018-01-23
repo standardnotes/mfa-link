@@ -15,16 +15,8 @@ export default class BridgeManager {
   }
 
   initiateBridge() {
-    // var permissions = [
-    //   {
-    //     // name: "stream-context-item"
-    //     name: "stream-items",
-    //     content_types: ["SF|MFA"]
-    //   }
-    // ]
-
     this.componentManager = new ComponentManager([], () => {
-
+      this.updateSize();
     });
 
     this.componentManager.streamItems(["SF|MFA"], (items) => {
@@ -46,13 +38,16 @@ export default class BridgeManager {
       }
 
       this.notifyObserversOfUpdate();
-
-      if(this.getInstalledMfa()) {
-        this.componentManager.setSize("container", 725, 425);
-      } else {
-        this.componentManager.setSize("container", 725, 625);
-      }
+      this.updateSize();
     });
+  }
+
+  updateSize() {
+    if(this.getInstalledMfa()) {
+      this.componentManager.setSize("container", 725, 425);
+    } else {
+      this.componentManager.setSize("container", 725, 625);
+    }
   }
 
   removeItemFromItems(item) {
@@ -106,6 +101,4 @@ export default class BridgeManager {
   removeUpdateObserver(observer) {
     this.updateObservers.splice(this.updateObservers.indexOf(observer), 1);
   }
-
-
 }
