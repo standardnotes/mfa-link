@@ -77,11 +77,12 @@ export default class BridgeManager {
     return this.items.filter((item) => {return item.uuid == uuid})[0];
   }
 
-  installMfa(secret) {
+  installMfa(secret, allowRecovery) {
     this.componentManager.createItem({
       content_type: "SF|MFA",
       content: {
-        name: "Google Authenticator",
+        name: "Two-factor authentication",
+        allowEmailRecovery: allowRecovery,
         secret: secret
       }
     }, (item) => {

@@ -29,7 +29,7 @@ export default class InstalledMFA extends React.Component {
         </p>
       </div>,
       <div className="panel-section">
-          <h1 className="panel-row outer-title"><strong>Google Authenticator</strong></h1>
+          <h1 className="panel-row outer-title"><strong>Two-factor Authentication</strong></h1>
 
         <div className="panel-row justify-left align-top">
 
@@ -52,6 +52,12 @@ export default class InstalledMFA extends React.Component {
               Current Token
               <strong>{otp}</strong>
             </p>
+
+            <p className="panel-row justify-left multi-label">
+              Email Recovery
+              <strong>{this.props.mfa.content.allowEmailRecovery ? "Enabled" : "Disabled"}</strong>
+            </p>
+
           </div>
         </div>
       </div>

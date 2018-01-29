@@ -281,11 +281,12 @@ var BridgeManager = function () {
     }
   }, {
     key: "installMfa",
-    value: function installMfa(secret) {
+    value: function installMfa(secret, allowRecovery) {
       this.componentManager.createItem({
         content_type: "SF|MFA",
         content: {
-          name: "Google Authenticator",
+          name: "Two-factor authentication",
+          allowEmailRecovery: allowRecovery,
           secret: secret
         }
       }, function (item) {});
@@ -2192,7 +2193,7 @@ var InstalledMFA = function (_React$Component) {
           _react2.default.createElement(
             'strong',
             null,
-            'Google Authenticator'
+            'Two-factor Authentication'
           )
         ),
         _react2.default.createElement(
@@ -3586,7 +3587,7 @@ var NewMFA = function (_React$Component) {
     };
 
     _this.confirmInstall = function () {
-      _BridgeManager2.default.get().installMfa(_this.state.secret);
+      _BridgeManager2.default.get().installMfa(_this.state.secret, _this.state.allowRecovery);
     };
 
     _this.handleKeyInputChange = function (event) {
@@ -3612,7 +3613,15 @@ var NewMFA = function (_React$Component) {
       }
     };
 
-    _this.state = { secret: _Util2.default.generateSecretKey() };
+    _this.toggleEmailRecovery = function () {
+      _this.setState({ allowRecovery: !_this.state.allowRecovery });
+    };
+
+    _this.recoveryLearnMore = function () {
+      _this.setState({ showRecoveryDetails: !_this.state.showRecoveryDetails });
+    };
+
+    _this.state = { secret: _Util2.default.generateSecretKey(), allowRecovery: true };
     setInterval(function () {
       var epoch = Math.round(new Date().getTime() / 1000.0);
       var countDown = 30 - epoch % 30;
@@ -3677,6 +3686,25 @@ var NewMFA = function (_React$Component) {
             }),
             _react2.default.createElement(
               "div",
+              { className: "panel-row center justify-left" },
+              _react2.default.createElement(
+                "label",
+                null,
+                _react2.default.createElement("input", { checked: this.state.allowRecovery, onChange: this.toggleEmailRecovery, type: "checkbox" }),
+                "Allow email recovery"
+              ),
+              _react2.default.createElement(
+                "span",
+                null,
+                _react2.default.createElement(
+                  "a",
+                  { onClick: this.recoveryLearnMore, style: { marginLeft: 8 }, className: "info" },
+                  "Learn More"
+                )
+              )
+            ),
+            _react2.default.createElement(
+              "div",
               { className: "panel-row button-group stretch form-submit" },
               _react2.default.createElement(
                 "button",
@@ -3687,7 +3715,40 @@ var NewMFA = function (_React$Component) {
                   "Install 2FA"
                 )
               )
-            )
+            ),
+            this.state.showRecoveryDetails && [_react2.default.createElement("div", { className: "panel-row" }), _react2.default.createElement(
+              "div",
+              { className: "panel-row" },
+              _react2.default.createElement(
+                "h1",
+                { className: "title" },
+                "Email recovery"
+              )
+            ), _react2.default.createElement(
+              "div",
+              { className: "panel-row" },
+              _react2.default.createElement(
+                "div",
+                { className: "panel-column" },
+                _react2.default.createElement(
+                  "p",
+                  null,
+                  "If you lose access to your device and your secret key, you will be unable to login to your account. If you enable Email Recovery, you can email Standard Notes from your account email to disable 2FA and allow you to sign back in to your account."
+                ),
+                _react2.default.createElement("br", null),
+                _react2.default.createElement(
+                  "p",
+                  null,
+                  "If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up. For power users who have good data safety practices, we recommend keeping this option ",
+                  _react2.default.createElement(
+                    "i",
+                    null,
+                    "disabled"
+                  ),
+                  " for optimum security."
+                )
+              )
+            )]
           )
         )
       ), !this.state.confirm && _react2.default.createElement(
@@ -3707,7 +3768,7 @@ var NewMFA = function (_React$Component) {
           _react2.default.createElement(
             "strong",
             null,
-            "Google Authenticator"
+            "Enable two-factor authentication"
           )
         ),
         _react2.default.createElement(
@@ -3768,7 +3829,7 @@ var NewMFA = function (_React$Component) {
                 _react2.default.createElement(
                   "p",
                   null,
-                  "Scan the QR code in your Google Authenticator app."
+                  "Scan the QR code in your authenticator app."
                 )
               ),
               _react2.default.createElement(
@@ -3805,7 +3866,7 @@ var NewMFA = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     "a",
-                    { className: "info" },
+                    { href: "https://standardnotes.org/help/2fa", target: "_blank", className: "info" },
                     "Key Storage Recommendations"
                   )
                 ),
@@ -3817,7 +3878,7 @@ var NewMFA = function (_React$Component) {
                     { className: "danger" },
                     "Important: "
                   ),
-                  "Google Authenticator does not restore your secret keys if you lose your device or get a new one. If you lose your Secret Key, you\u2019ll be ",
+                  "Some apps, like Google Authenticator, do not back up and restore your secret keys if you lose your device or get a new one. If you lose your Secret Key, you\u2019ll be ",
                   _react2.default.createElement(
                     "strong",
                     { className: "danger" },
