@@ -2239,6 +2239,16 @@ var InstalledMFA = function (_React$Component) {
                 null,
                 otp
               )
+            ),
+            _react2.default.createElement(
+              'p',
+              { className: 'panel-row justify-left multi-label' },
+              'Email Recovery',
+              _react2.default.createElement(
+                'strong',
+                null,
+                this.props.mfa.content.allowEmailRecovery ? "Enabled" : "Disabled"
+              )
             )
           )
         )
@@ -3692,15 +3702,6 @@ var NewMFA = function (_React$Component) {
                 null,
                 _react2.default.createElement("input", { checked: this.state.allowRecovery, onChange: this.toggleEmailRecovery, type: "checkbox" }),
                 "Allow email recovery"
-              ),
-              _react2.default.createElement(
-                "span",
-                null,
-                _react2.default.createElement(
-                  "a",
-                  { onClick: this.recoveryLearnMore, style: { marginLeft: 8 }, className: "info" },
-                  "Learn More"
-                )
               )
             ),
             _react2.default.createElement(
@@ -3716,7 +3717,8 @@ var NewMFA = function (_React$Component) {
                 )
               )
             ),
-            this.state.showRecoveryDetails && [_react2.default.createElement("div", { className: "panel-row" }), _react2.default.createElement(
+            _react2.default.createElement("div", { className: "panel-row" }),
+            _react2.default.createElement(
               "div",
               { className: "panel-row" },
               _react2.default.createElement(
@@ -3724,7 +3726,8 @@ var NewMFA = function (_React$Component) {
                 { className: "title" },
                 "Email recovery"
               )
-            ), _react2.default.createElement(
+            ),
+            _react2.default.createElement(
               "div",
               { className: "panel-row" },
               _react2.default.createElement(
@@ -3748,7 +3751,7 @@ var NewMFA = function (_React$Component) {
                   " for optimum security."
                 )
               )
-            )]
+            )
           )
         )
       ), !this.state.confirm && _react2.default.createElement(
