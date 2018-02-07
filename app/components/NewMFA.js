@@ -108,7 +108,7 @@ export default class NewMFA extends React.Component {
               <div className="panel-row"/>
               <div className="panel-row">
                 <h1 className="title">
-                  Email recovery
+                  Email Recovery
                 </h1>
               </div>
 
@@ -122,7 +122,7 @@ export default class NewMFA extends React.Component {
                   <br/>
                   <p>
                   If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up.
-                  For power users who have good data safety practices, we recommend keeping this option <i>disabled</i> for optimum security.
+                  For power users who maintain good data safety practices, we recommend keeping this option <i>disabled</i> for optimum security.
                   </p>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default class NewMFA extends React.Component {
                 </li>
                 <li>
                   <p>Save the <strong>Secret Key</strong> somewhere safe.</p>
-                  <p><a href="https://standardnotes.org/help/2fa" target="_blank" className="info">Key Storage Recommendations</a></p>
+                  <p><a href="https://standardnotes.org/help/21/where-should-i-store-my-two-factor-authentication-secret-key" target="_blank" className="info">Key Storage Recommendations</a></p>
                   <p>
                     <strong className="danger">Important: </strong>
                     Some apps, like Google Authenticator, do not back up and restore your secret keys if you lose your device or get a new one.
@@ -195,5 +195,4 @@ export default class NewMFA extends React.Component {
       )
     ]
   }
-
 }

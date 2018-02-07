@@ -3724,7 +3724,7 @@ var NewMFA = function (_React$Component) {
               _react2.default.createElement(
                 "h1",
                 { className: "title" },
-                "Email recovery"
+                "Email Recovery"
               )
             ),
             _react2.default.createElement(
@@ -3742,7 +3742,7 @@ var NewMFA = function (_React$Component) {
                 _react2.default.createElement(
                   "p",
                   null,
-                  "If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up. For power users who have good data safety practices, we recommend keeping this option ",
+                  "If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up. For power users who maintain good data safety practices, we recommend keeping this option ",
                   _react2.default.createElement(
                     "i",
                     null,
@@ -3869,7 +3869,7 @@ var NewMFA = function (_React$Component) {
                   null,
                   _react2.default.createElement(
                     "a",
-                    { href: "https://standardnotes.org/help/2fa", target: "_blank", className: "info" },
+                    { href: "https://standardnotes.org/help/21/where-should-i-store-my-two-factor-authentication-secret-key", target: "_blank", className: "info" },
                     "Key Storage Recommendations"
                   )
                 ),
