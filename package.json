@@ -1,6 +1,6 @@
 {
   "name": "sn-mfa-link",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "main": "dist/dist.js",
   "scripts": {
     "lint": "eslint --cache --ignore-path .gitignore --ext .jsx,.js --format=node_modules/eslint-formatter-pretty .",
@@ -49,6 +49,6 @@
     "hi-base32": "^0.3.0",
     "jssha": "^2.3.1",
     "qrcode.react": "^0.7.2",
-    "sn-stylekit": "^1.0.1198"
+    "sn-stylekit": "1.0.12"
   }
 }
