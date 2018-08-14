@@ -1682,6 +1682,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var ComponentManager = function () {
   function ComponentManager(permissions, onReady) {
+    var _this = this;
+
     _classCallCheck(this, ComponentManager);
 
     this.sentMessages = [];
@@ -1694,12 +1696,32 @@ var ComponentManager = function () {
     this.coallesedSaving = true;
     this.coallesedSavingDelay = 250;
 
-    window.addEventListener("message", function (event) {
-      if (this.loggingEnabled) {
-        console.log("Components API Message received:", event.data);
+    var messageHandler = function messageHandler(event, mobileSource) {
+      if (_this.loggingEnabled) {
+        console.log("Components API Message received:", event.data, "mobile?", mobileSource);
       }
-      this.handleMessage(event.data);
-    }.bind(this), false);
+
+      // The first message will be the most reliable one, so we won't change it after any subsequent events,
+      // in case you receive an event from another window.
+      if (!_this.origin) {
+        _this.origin = event.origin;
+      }
+      _this.mobileSource = mobileSource;
+      // If from mobile app, JSON needs to be used.
+      var data = mobileSource ? JSON.parse(event.data) : event.data;
+      _this.handleMessage(data);
+    };
+
+    // Mobile (React Native) uses `document`, web/desktop uses `window`.addEventListener
+    // for postMessage API to work properly.
+
+    document.addEventListener("message", function (event) {
+      messageHandler(event, true);
+    }, false);
+
+    window.addEventListener("message", function (event) {
+      messageHandler(event, false);
+    }, false);
   }
 
   _createClass(ComponentManager, [{
@@ -1722,6 +1744,11 @@ var ComponentManager = function () {
         var originalMessage = this.sentMessages.filter(function (message) {
           return message.messageId === payload.original.messageId;
         })[0];
+
+        if (!originalMessage) {
+          // Connection must have been reset. Alert the user.
+          alert("This extension is attempting to communicate with Standard Notes, but an error is preventing it from doing so. Please restart this extension and try again.");
+        }
 
         if (originalMessage.callback) {
           originalMessage.callback(payload.data);
@@ -1762,10 +1789,16 @@ var ComponentManager = function () {
 
       this.messageQueue = [];
       this.environment = data.environment;
+      this.uuid = data.uuid;
 
       if (this.onReadyCallback) {
         this.onReadyCallback();
       }
+    }
+  }, {
+    key: "getSelfComponentUUID",
+    value: function getSelfComponentUUID() {
+      return this.uuid;
     }
   }, {
     key: "isRunningInDesktopApplication",
@@ -1813,11 +1846,16 @@ var ComponentManager = function () {
       sentMessage.callback = callback;
       this.sentMessages.push(sentMessage);
 
+      // Mobile (React Native) requires a string for the postMessage API.
+      if (this.mobileSource) {
+        message = JSON.stringify(message);
+      }
+
       if (this.loggingEnabled) {
         console.log("Posting message:", message);
       }
 
-      window.parent.postMessage(message, '*');
+      window.parent.postMessage(message, this.origin);
     }
   }, {
     key: "setSize",
@@ -1844,19 +1882,21 @@ var ComponentManager = function () {
   }, {
     key: "streamContextItem",
     value: function streamContextItem(callback) {
-      var _this = this;
-
       this.postMessage("stream-context-item", null, function (data) {
         var item = data.item;
         /*
           When an item is saved via saveItem, its updated_at value is set client side to the current date.
           If we make a change locally, then for whatever reason receive an item via streamItems/streamContextItem,
           we want to ignore that change if it was made prior to the latest change we've made.
+           Update 1/22/18: However, if a user is restoring a note from version history, this change
+          will not pass through this filter and will thus be ignored. Because the client now handles
+          this case with isMetadataUpdate, we no longer need the below.
         */
-        if (_this.streamedContextItem && _this.streamedContextItem.uuid == item.uuid && _this.streamedContextItem.updated_at > item.updated_at) {
-          return;
-        }
-        _this.streamedContextItem = item;
+        // if(this.streamedContextItem && this.streamedContextItem.uuid == item.uuid
+        //   && this.streamedContextItem.updated_at > item.updated_at) {
+        //   return;
+        // }
+        // this.streamedContextItem = item;
         callback(item);
       });
     }
@@ -1870,8 +1910,27 @@ var ComponentManager = function () {
     value: function createItem(item, callback) {
       this.postMessage("create-item", { item: this.jsonObjectForItem(item) }, function (data) {
         var item = data.item;
+
+        // A previous version of the SN app had an issue where the item in the reply to create-item
+        // would be nested inside "items" and not "item". So handle both cases here.
+        if (!item && data.items && data.items.length > 0) {
+          item = data.items[0];
+        }
+
         this.associateItem(item);
         callback && callback(item);
+      }.bind(this));
+    }
+  }, {
+    key: "createItems",
+    value: function createItems(items, callback) {
+      var _this2 = this;
+
+      var mapped = items.map(function (item) {
+        return _this2.jsonObjectForItem(item);
+      });
+      this.postMessage("create-items", { items: mapped }, function (data) {
+        callback && callback(data.items);
       }.bind(this));
     }
   }, {
@@ -1914,12 +1973,22 @@ var ComponentManager = function () {
   }, {
     key: "saveItem",
     value: function saveItem(item, callback) {
-      this.saveItems([item], callback);
+      var skipDebouncer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      this.saveItems([item], callback, skipDebouncer);
     }
+
+    /*
+    skipDebouncer allows saves to go through right away rather than waiting for timeout.
+    This should be used when saving items via other means besides keystrokes.
+     */
+
   }, {
     key: "saveItems",
     value: function saveItems(items, callback) {
-      var _this2 = this;
+      var _this3 = this;
+
+      var skipDebouncer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
       items = items.map(function (item) {
         item.updated_at = new Date();
@@ -1927,21 +1996,21 @@ var ComponentManager = function () {
       }.bind(this));
 
       var saveBlock = function saveBlock() {
-        _this2.postMessage("save-items", { items: items }, function (data) {
+        _this3.postMessage("save-items", { items: items }, function (data) {
           callback && callback();
         });
       };
 
       /*
-          Coallesed saving prevents saves from being made after every keystroke, and instead
-          waits coallesedSavingDelay before performing action. For example, if a user types a keystroke, and the clienet calls saveItem,
-          a 250ms delay will begin. If they type another keystroke within 250ms, the previously pending
-          save will be cancelled, and another 250ms delay occurs. If ater 250ms the pending delay is not cleared by a future call,
-          the save will finally trigger.
-           Note: it's important to modify saving items updated_at immediately and not after delay. If you modify after delay,
-          a delayed sync could just be wrapping up, and will send back old data and replace what the user has typed.
+        Coallesed saving prevents saves from being made after every keystroke, and instead
+        waits coallesedSavingDelay before performing action. For example, if a user types a keystroke, and the clienet calls saveItem,
+        a 250ms delay will begin. If they type another keystroke within 250ms, the previously pending
+        save will be cancelled, and another 250ms delay occurs. If ater 250ms the pending delay is not cleared by a future call,
+        the save will finally trigger.
+         Note: it's important to modify saving items updated_at immediately and not after delay. If you modify after delay,
+        a delayed sync could just be wrapping up, and will send back old data and replace what the user has typed.
       */
-      if (this.coallesedSaving == true) {
+      if (this.coallesedSaving == true && !skipDebouncer) {
         if (this.pendingSave) {
           clearTimeout(this.pendingSave);
         }
@@ -1949,6 +2018,8 @@ var ComponentManager = function () {
         this.pendingSave = setTimeout(function () {
           saveBlock();
         }, this.coallesedSavingDelay);
+      } else {
+        saveBlock();
       }
     }
   }, {
@@ -1958,6 +2029,17 @@ var ComponentManager = function () {
       copy.children = null;
       copy.parent = null;
       return copy;
+    }
+  }, {
+    key: "getItemAppDataValue",
+    value: function getItemAppDataValue(item, key) {
+      var AppDomain = "org.standardnotes.sn";
+      var data = item.content.appData && item.content.appData[AppDomain];
+      if (data) {
+        return data[key];
+      } else {
+        return null;
+      }
     }
 
     /* Themes */
@@ -2013,14 +2095,36 @@ var ComponentManager = function () {
   }, {
     key: "deactivateAllCustomThemes",
     value: function deactivateAllCustomThemes() {
-      var elements = document.getElementsByClassName("custom-theme");
+      // make copy, as it will be modified during loop
+      // `getElementsByClassName` is an HTMLCollection, not an Array
+      var elements = Array.from(document.getElementsByClassName("custom-theme")).slice();
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
-      [].forEach.call(elements, function (element) {
-        if (element) {
-          element.disabled = true;
-          element.parentNode.removeChild(element);
+      try {
+        for (var _iterator3 = elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var element = _step3.value;
+
+          if (element) {
+            element.disabled = true;
+            element.parentNode.removeChild(element);
+          }
         }
-      });
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
     }
 
     /* Utilities */
