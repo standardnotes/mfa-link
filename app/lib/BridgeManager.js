@@ -85,12 +85,16 @@ export default class BridgeManager {
         allowEmailRecovery: allowRecovery,
         secret: secret
       }
-    }, (item) => {
     });
   }
 
   uninstallMfa(mfa) {
-    this.componentManager.deleteItem(mfa);
+    // Uninstall all instances of SF|MFA, in case there are duplicates
+    var items = this.items.filter((item) => {
+      return item.content.secret == mfa.content.secret;
+    })
+
+    this.componentManager.deleteItems(items);
   }
 
   addUpdateObserver(callback) {

@@ -289,12 +289,17 @@ var BridgeManager = function () {
           allowEmailRecovery: allowRecovery,
           secret: secret
         }
-      }, function (item) {});
+      });
     }
   }, {
     key: "uninstallMfa",
     value: function uninstallMfa(mfa) {
-      this.componentManager.deleteItem(mfa);
+      // Uninstall all instances of SF|MFA, in case there are duplicates
+      var items = this.items.filter(function (item) {
+        return item.content.secret == mfa.content.secret;
+      });
+
+      this.componentManager.deleteItems(items);
     }
   }, {
     key: "addUpdateObserver",
@@ -2182,7 +2187,7 @@ var InstalledMFA = function (_React$Component) {
         _react2.default.createElement(
           'p',
           null,
-          '2FA is enabled. You can disable 2FA by pressing Uninstall below.'
+          '2FA is enabled. You can disable 2FA by pressing Disable below.'
         )
       ), _react2.default.createElement(
         'div',
@@ -2212,7 +2217,7 @@ var InstalledMFA = function (_React$Component) {
                 _react2.default.createElement(
                   'div',
                   { className: 'label' },
-                  'Uninstall'
+                  'Disable'
                 )
               )
             )
@@ -3760,7 +3765,7 @@ var NewMFA = function (_React$Component) {
         _react2.default.createElement(
           "p",
           null,
-          "2FA is currently disabled. You can enable 2FA by accepting the code below and pressing \u201CInstall\u201D."
+          "2FA is currently disabled. You can enable 2FA by accepting the code below and pressing Enable."
         )
       ), !this.state.confirm && _react2.default.createElement(
         "div",
@@ -3790,7 +3795,7 @@ var NewMFA = function (_React$Component) {
                 _react2.default.createElement(
                   "div",
                   { className: "label" },
-                  "Install"
+                  "Enable"
                 )
               )
             )
@@ -3899,7 +3904,7 @@ var NewMFA = function (_React$Component) {
                   _react2.default.createElement(
                     "i",
                     null,
-                    "Install"
+                    "Enable"
                   ),
                   "."
                 )

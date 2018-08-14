@@ -25,7 +25,7 @@ export default class InstalledMFA extends React.Component {
     return [
       <div className="panel-section no-border no-bottom-pad">
         <p>
-          2FA is enabled. You can disable 2FA by pressing Uninstall below.
+          2FA is enabled. You can disable 2FA by pressing Disable below.
         </p>
       </div>,
       <div className="panel-section">
@@ -37,7 +37,7 @@ export default class InstalledMFA extends React.Component {
             <QRCode value={url}/>
             <div className="panel-row button-group stretch">
               <div className="button danger" onClick={this.uninstall}>
-                <div className="label">Uninstall</div>
+                <div className="label">Disable</div>
               </div>
             </div>
           </div>

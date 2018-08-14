@@ -134,7 +134,7 @@ export default class NewMFA extends React.Component {
       (!this.state.confirm &&
         <div className="panel-section no-border no-bottom-pad">
           <p>
-            2FA is currently disabled. You can enable 2FA by accepting the code below and pressing “Install”.
+            2FA is currently disabled. You can enable 2FA by accepting the code below and pressing Enable.
           </p>
         </div>
       ),
@@ -150,7 +150,7 @@ export default class NewMFA extends React.Component {
               <QRCode value={url}/>
               <div className="panel-row button-group stretch">
                 <div className="button info" onClick={this.install}>
-                  <div className="label">Install</div>
+                  <div className="label">Enable</div>
                 </div>
               </div>
             </div>
@@ -185,7 +185,7 @@ export default class NewMFA extends React.Component {
                   </p>
                 </li>
                 <li>
-                  <p>Press <i>Install</i>.</p>
+                  <p>Press <i>Enable</i>.</p>
                 </li>
               </ol>
 
