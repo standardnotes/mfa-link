@@ -219,7 +219,7 @@ var BridgeManager = function () {
       if (this.getInstalledMfa()) {
         this.componentManager.setSize("container", 725, 425);
       } else {
-        this.componentManager.setSize("container", 725, 625);
+        this.componentManager.setSize("container", 725, 540);
       }
     }
   }, {
@@ -1653,10 +1653,10 @@ var Home = function (_React$Component) {
       var mfa = this.state.installedMfa;
       return _react2.default.createElement(
         "div",
-        { className: "panel static" },
+        { className: "sk-panel static" },
         _react2.default.createElement(
           "div",
-          { className: "content" },
+          { className: "sk-panel-content" },
           mfa && _react2.default.createElement(_InstalledMFA2.default, { mfa: mfa }),
           !mfa && _react2.default.createElement(_NewMFA2.default, null)
         )
@@ -1789,6 +1789,7 @@ var ComponentManager = function () {
 
       this.messageQueue = [];
       this.environment = data.environment;
+      this.platform = data.platform;
       this.uuid = data.uuid;
 
       if (this.onReadyCallback) {
@@ -1950,18 +1951,21 @@ var ComponentManager = function () {
     }
   }, {
     key: "deleteItem",
-    value: function deleteItem(item) {
-      this.deleteItems([item]);
+    value: function deleteItem(item, callback) {
+      this.deleteItems([item], callback);
     }
   }, {
     key: "deleteItems",
-    value: function deleteItems(items) {
+    value: function deleteItems(items, callback) {
       var params = {
         items: items.map(function (item) {
           return this.jsonObjectForItem(item);
         }.bind(this))
       };
-      this.postMessage("delete-items", params);
+
+      this.postMessage("delete-items", params, function (data) {
+        callback && callback(data);
+      });
     }
   }, {
     key: "sendCustomEvent",
@@ -1978,6 +1982,22 @@ var ComponentManager = function () {
       this.saveItems([item], callback, skipDebouncer);
     }
 
+    /* Presave allows clients to perform any actions last second before the save actually occurs (like setting previews).
+       Saves debounce by default, so if a client needs to compute a property on an item before saving, it's best to
+       hook into the debounce cycle so that clients don't have to implement their own debouncing.
+     */
+
+  }, {
+    key: "saveItemWithPresave",
+    value: function saveItemWithPresave(item, presave, callback) {
+      this.saveItemsWithPresave([item], presave, callback);
+    }
+  }, {
+    key: "saveItemsWithPresave",
+    value: function saveItemsWithPresave(items, presave, callback) {
+      this.saveItems(items, callback, false, presave);
+    }
+
     /*
     skipDebouncer allows saves to go through right away rather than waiting for timeout.
     This should be used when saving items via other means besides keystrokes.
@@ -1989,14 +2009,18 @@ var ComponentManager = function () {
       var _this3 = this;
 
       var skipDebouncer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-      items = items.map(function (item) {
-        item.updated_at = new Date();
-        return this.jsonObjectForItem(item);
-      }.bind(this));
+      var presave = arguments[3];
 
       var saveBlock = function saveBlock() {
-        _this3.postMessage("save-items", { items: items }, function (data) {
+        // presave block allows client to gain the benefit of performing something in the debounce cycle.
+        presave && presave();
+
+        var mappedItems = items.map(function (item) {
+          item.updated_at = new Date();
+          return this.jsonObjectForItem(item);
+        }.bind(_this3));
+
+        _this3.postMessage("save-items", { items: mappedItems }, function (data) {
           callback && callback();
         });
       };
@@ -2287,40 +2311,36 @@ var InstalledMFA = function (_React$Component) {
       var otp = _Util2.default.getOtp(secret);
       return [_react2.default.createElement(
         'div',
-        { className: 'panel-section no-border no-bottom-pad' },
+        { className: 'sk-panel-section no-border no-bottom-pad' },
         _react2.default.createElement(
-          'p',
-          null,
+          'div',
+          { className: 'sk-p' },
           '2FA is enabled. You can disable 2FA by pressing Disable below.'
         )
       ), _react2.default.createElement(
         'div',
-        { className: 'panel-section' },
+        { className: 'sk-panel-section' },
         _react2.default.createElement(
-          'h1',
-          { className: 'panel-row outer-title' },
-          _react2.default.createElement(
-            'strong',
-            null,
-            'Two-factor Authentication'
-          )
+          'div',
+          { className: 'sk-panel-row sk-panel-section-outer-title' },
+          'Two-factor Authentication'
         ),
         _react2.default.createElement(
           'div',
-          { className: 'panel-row justify-left align-top' },
+          { className: 'sk-panel-row justify-left align-top' },
           _react2.default.createElement(
             'div',
-            { className: 'panel-column' },
+            { className: 'sk-panel-column' },
             _react2.default.createElement(QRCode, { value: url }),
             _react2.default.createElement(
               'div',
-              { className: 'panel-row button-group stretch' },
+              { className: 'sk-panel-row sk-button-group stretch' },
               _react2.default.createElement(
                 'div',
-                { className: 'button danger', onClick: this.uninstall },
+                { className: 'sk-button danger', onClick: this.uninstall },
                 _react2.default.createElement(
                   'div',
-                  { className: 'label' },
+                  { className: 'sk-label' },
                   'Disable'
                 )
               )
@@ -2328,34 +2348,34 @@ var InstalledMFA = function (_React$Component) {
           ),
           _react2.default.createElement(
             'div',
-            { className: 'panel-column right-section' },
+            { className: 'sk-panel-column right-section' },
             _react2.default.createElement(
-              'p',
-              { className: 'panel-row justify-left multi-label' },
+              'div',
+              { className: 'sk-panel-row justify-left multi-label' },
               'Secret Key',
               _react2.default.createElement(
-                'strong',
-                null,
+                'span',
+                { className: 'info sk-bold' },
                 secret
               )
             ),
             _react2.default.createElement(
-              'p',
-              { className: 'panel-row justify-left multi-label' },
+              'div',
+              { className: 'sk-panel-row justify-left multi-label' },
               'Current Token',
               _react2.default.createElement(
-                'strong',
-                null,
+                'span',
+                { className: 'info sk-bold' },
                 otp
               )
             ),
             _react2.default.createElement(
-              'p',
-              { className: 'panel-row justify-left multi-label' },
+              'div',
+              { className: 'sk-panel-row justify-left multi-label' },
               'Email Recovery',
               _react2.default.createElement(
-                'strong',
-                null,
+                'span',
+                { className: 'info sk-bold' },
                 this.props.mfa.content.allowEmailRecovery ? "Enabled" : "Disabled"
               )
             )
@@ -3757,13 +3777,13 @@ var NewMFA = function (_React$Component) {
       var otp = _Util2.default.getOtp(secret);
       return [this.state.confirm && _react2.default.createElement(
         "div",
-        { className: "panel-section no-border no-bottom-pad" },
+        { className: "sk-panel-section no-border no-bottom-pad" },
         _react2.default.createElement(
           "div",
-          { className: "panel-row" },
+          { className: "sk-panel-row" },
           _react2.default.createElement(
-            "h1",
-            { className: "title" },
+            "div",
+            { className: "sk-panel-section-title" },
             "Confirm 2FA"
           ),
           _react2.default.createElement(
@@ -3774,10 +3794,10 @@ var NewMFA = function (_React$Component) {
         ),
         _react2.default.createElement(
           "div",
-          { className: "panel-row" },
+          { className: "sk-panel-row" },
           _react2.default.createElement(
-            "p",
-            null,
+            "div",
+            { className: "sk-p" },
             "Ensure you have stored your ",
             _react2.default.createElement(
               "strong",
@@ -3789,23 +3809,25 @@ var NewMFA = function (_React$Component) {
         ),
         _react2.default.createElement(
           "form",
-          { className: "panel-row panel-form", onSubmit: this.submitConfirmationForm },
+          { className: "sk-panel-row panel-form", onSubmit: this.submitConfirmationForm },
           _react2.default.createElement(
             "div",
             { className: "panel-column stretch" },
             _react2.default.createElement("input", {
+              className: "sk-input contrast",
               placeholder: "Enter Secret Key",
               value: this.state.confirmKey,
               onChange: this.handleKeyInputChange
             }),
             _react2.default.createElement("input", {
+              className: "sk-input contrast",
               placeholder: "Enter Current Token",
               value: this.state.confirmToken,
               onChange: this.handleTokenInputChange
             }),
             _react2.default.createElement(
               "div",
-              { className: "panel-row center justify-left" },
+              { className: "sk-panel-row center justify-left" },
               _react2.default.createElement(
                 "label",
                 null,
@@ -3813,44 +3835,41 @@ var NewMFA = function (_React$Component) {
                 "Allow email recovery"
               )
             ),
+            _react2.default.createElement("div", { className: "sk-panel-row" }),
             _react2.default.createElement(
               "div",
-              { className: "panel-row button-group stretch form-submit" },
+              { className: "sk-panel-row button-group stretch form-submit" },
               _react2.default.createElement(
                 "button",
-                { className: "button info featured", type: "submit" },
+                { className: "sk-button info featured", type: "submit" },
                 _react2.default.createElement(
                   "div",
-                  { className: "label" },
+                  { className: "sk-label" },
                   "Install 2FA"
                 )
               )
             ),
-            _react2.default.createElement("div", { className: "panel-row" }),
+            _react2.default.createElement("div", { className: "sk-panel-row" }),
             _react2.default.createElement(
               "div",
-              { className: "panel-row" },
-              _react2.default.createElement(
-                "h1",
-                { className: "title" },
-                "Email Recovery"
-              )
+              { className: "sk-panel-section-outer-title sk-bold" },
+              "Email Recovery"
             ),
             _react2.default.createElement(
               "div",
-              { className: "panel-row" },
+              { className: "sk-panel-row", style: { paddingBottom: 14 } },
               _react2.default.createElement(
                 "div",
                 { className: "panel-column" },
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   "If you lose access to your device and your secret key, you will be unable to login to your account. If you enable Email Recovery, you can email Standard Notes from your account email to disable 2FA and allow you to sign back in to your account."
                 ),
                 _react2.default.createElement("br", null),
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   "If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up. For power users who maintain good data safety practices, we recommend keeping this option ",
                   _react2.default.createElement(
                     "i",
@@ -3865,18 +3884,18 @@ var NewMFA = function (_React$Component) {
         )
       ), !this.state.confirm && _react2.default.createElement(
         "div",
-        { className: "panel-section no-border no-bottom-pad" },
+        { className: "sk-panel-section no-border no-bottom-pad" },
         _react2.default.createElement(
-          "p",
-          null,
+          "div",
+          { className: "sk-p" },
           "2FA is currently disabled. You can enable 2FA by accepting the code below and pressing Enable."
         )
       ), !this.state.confirm && _react2.default.createElement(
         "div",
-        { className: "panel-section" },
+        { className: "sk-panel-section" },
         _react2.default.createElement(
-          "h1",
-          { className: "panel-row outer-title" },
+          "div",
+          { className: "sk-panel-section-outer-title" },
           _react2.default.createElement(
             "strong",
             null,
@@ -3885,20 +3904,20 @@ var NewMFA = function (_React$Component) {
         ),
         _react2.default.createElement(
           "div",
-          { className: "panel-row justify-left align-top" },
+          { className: "sk-panel-row justify-left align-top" },
           _react2.default.createElement(
             "div",
             { className: "panel-column" },
             _react2.default.createElement(QRCode, { value: url }),
             _react2.default.createElement(
               "div",
-              { className: "panel-row button-group stretch" },
+              { className: "sk-panel-row sk-button-group stretch" },
               _react2.default.createElement(
                 "div",
-                { className: "button info", onClick: this.install },
+                { className: "sk-button info", onClick: this.install },
                 _react2.default.createElement(
                   "div",
-                  { className: "label" },
+                  { className: "sk-label" },
                   "Enable"
                 )
               )
@@ -3908,30 +3927,37 @@ var NewMFA = function (_React$Component) {
             "div",
             { className: "panel-column right-section" },
             _react2.default.createElement(
-              "p",
-              { className: "panel-row justify-left multi-label" },
+              "div",
+              { className: "sk-p sk-panel-row justify-left multi-label" },
               "Secret Key",
               _react2.default.createElement(
-                "strong",
-                null,
+                "span",
+                { className: "info sk-bold" },
                 secret
               )
             ),
             _react2.default.createElement(
-              "p",
-              { className: "panel-row justify-left multi-label" },
+              "div",
+              { className: "sk-p sk-panel-row justify-left multi-label" },
               "Current Token",
               _react2.default.createElement(
-                "strong",
-                null,
+                "span",
+                { className: "info sk-bold" },
                 otp
               )
             ),
+            _react2.default.createElement("div", { className: "sk-panel-row" }),
             _react2.default.createElement(
-              "h2",
-              { className: "panel-row" },
-              "Instructions (read very carefully):"
+              "div",
+              { className: "sk-h2 sk-bold" },
+              "Instructions"
             ),
+            _react2.default.createElement(
+              "div",
+              { className: "sk-h4 danger" },
+              "Please read carefully."
+            ),
+            _react2.default.createElement("div", { className: "sk-panel-row" }),
             _react2.default.createElement(
               "ol",
               null,
@@ -3939,8 +3965,8 @@ var NewMFA = function (_React$Component) {
                 "li",
                 null,
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   "Scan the QR code in your authenticator app."
                 )
               ),
@@ -3948,8 +3974,8 @@ var NewMFA = function (_React$Component) {
                 "li",
                 null,
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   "Ensure you see the code ",
                   _react2.default.createElement(
                     "strong",
@@ -3963,8 +3989,8 @@ var NewMFA = function (_React$Component) {
                 "li",
                 null,
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   "Save the ",
                   _react2.default.createElement(
                     "strong",
@@ -3973,18 +3999,20 @@ var NewMFA = function (_React$Component) {
                   ),
                   " somewhere safe."
                 ),
+                _react2.default.createElement("div", { className: "sk-panel-row" }),
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   _react2.default.createElement(
                     "a",
                     { href: "https://standardnotes.org/help/21/where-should-i-store-my-two-factor-authentication-secret-key", target: "_blank", className: "info" },
                     "Key Storage Recommendations"
                   )
                 ),
+                _react2.default.createElement("div", { className: "sk-panel-row" }),
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   _react2.default.createElement(
                     "strong",
                     { className: "danger" },
@@ -4002,8 +4030,8 @@ var NewMFA = function (_React$Component) {
                 "li",
                 null,
                 _react2.default.createElement(
-                  "p",
-                  null,
+                  "div",
+                  { className: "sk-p" },
                   "Press ",
                   _react2.default.createElement(
                     "i",

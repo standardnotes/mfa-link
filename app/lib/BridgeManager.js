@@ -46,7 +46,7 @@ export default class BridgeManager {
     if(this.getInstalledMfa()) {
       this.componentManager.setSize("container", 725, 425);
     } else {
-      this.componentManager.setSize("container", 725, 625);
+      this.componentManager.setSize("container", 725, 540);
     }
   }
 

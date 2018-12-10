@@ -23,41 +23,39 @@ export default class InstalledMFA extends React.Component {
     var url = Util.generateQrCodeUrl(secret);
     var otp = Util.getOtp(secret);
     return [
-      <div className="panel-section no-border no-bottom-pad">
-        <p>
+      <div className="sk-panel-section no-border no-bottom-pad">
+        <div className="sk-p">
           2FA is enabled. You can disable 2FA by pressing Disable below.
-        </p>
+        </div>
       </div>,
-      <div className="panel-section">
-          <h1 className="panel-row outer-title"><strong>Two-factor Authentication</strong></h1>
+      <div className="sk-panel-section">
+        <div className="sk-panel-row sk-panel-section-outer-title">Two-factor Authentication</div>
+        <div className="sk-panel-row justify-left align-top">
 
-        <div className="panel-row justify-left align-top">
-
-          <div className="panel-column">
+          <div className="sk-panel-column">
             <QRCode value={url}/>
-            <div className="panel-row button-group stretch">
-              <div className="button danger" onClick={this.uninstall}>
-                <div className="label">Disable</div>
+            <div className="sk-panel-row sk-button-group stretch">
+              <div className="sk-button danger" onClick={this.uninstall}>
+                <div className="sk-label">Disable</div>
               </div>
             </div>
           </div>
 
-          <div className="panel-column right-section">
+          <div className="sk-panel-column right-section">
 
-            <p className="panel-row justify-left multi-label">
+            <div className="sk-panel-row justify-left multi-label">
               Secret Key
-              <strong>{secret}</strong>
-            </p>
-            <p className="panel-row justify-left multi-label">
+              <span className="info sk-bold">{secret}</span>
+            </div>
+            <div className="sk-panel-row justify-left multi-label">
               Current Token
-              <strong>{otp}</strong>
-            </p>
+              <span className="info sk-bold">{otp}</span>
+            </div>
 
-            <p className="panel-row justify-left multi-label">
+            <div className="sk-panel-row justify-left multi-label">
               Email Recovery
-              <strong>{this.props.mfa.content.allowEmailRecovery ? "Enabled" : "Disabled"}</strong>
-            </p>
-
+              <span className="info sk-bold">{this.props.mfa.content.allowEmailRecovery ? "Enabled" : "Disabled"}</span>
+            </div>
           </div>
         </div>
       </div>

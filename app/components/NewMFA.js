@@ -65,65 +65,68 @@ export default class NewMFA extends React.Component {
     return [
 
       (this.state.confirm &&
-        <div className="panel-section no-border no-bottom-pad">
-          <div className="panel-row">
-            <h1 className="title">
+        <div className="sk-panel-section no-border no-bottom-pad">
+          <div className="sk-panel-row">
+            <div className="sk-panel-section-title">
               Confirm 2FA
-            </h1>
+            </div>
             <a onClick={this.cancelConfirmation} className="info">Cancel</a>
           </div>
 
-          <div className="panel-row">
-            <p>
-            Ensure you have stored your <strong>Secret Key</strong> somewhere safe. If you lose this key, you lose access to your account.
-            </p>
+          <div className="sk-panel-row">
+            <div className="sk-p">
+              Ensure you have stored your <strong>Secret Key</strong> somewhere safe. If you lose this key, you lose access to your account.
+            </div>
           </div>
 
-          <form className="panel-row panel-form" onSubmit={this.submitConfirmationForm}>
+          <form className="sk-panel-row panel-form" onSubmit={this.submitConfirmationForm}>
             <div className="panel-column stretch">
               <input
+                className="sk-input contrast"
                 placeholder="Enter Secret Key"
                 value={this.state.confirmKey}
                 onChange={this.handleKeyInputChange}
               />
               <input
+                className="sk-input contrast"
                 placeholder="Enter Current Token"
                 value={this.state.confirmToken}
                 onChange={this.handleTokenInputChange}
               />
 
-              <div className="panel-row center justify-left">
+              <div className="sk-panel-row center justify-left">
                 <label>
                   <input checked={this.state.allowRecovery} onChange={this.toggleEmailRecovery} type="checkbox" />
                   Allow email recovery
                 </label>
               </div>
 
-              <div className="panel-row button-group stretch form-submit">
-                <button className="button info featured" type="submit">
-                  <div className="label">Install 2FA</div>
+              <div className="sk-panel-row"/>
+
+              <div className="sk-panel-row button-group stretch form-submit">
+                <button className="sk-button info featured" type="submit">
+                  <div className="sk-label">Install 2FA</div>
                 </button>
               </div>
 
-              <div className="panel-row"/>
-              <div className="panel-row">
-                <h1 className="title">
-                  Email Recovery
-                </h1>
+              <div className="sk-panel-row"/>
+
+              <div className="sk-panel-section-outer-title sk-bold">
+                Email Recovery
               </div>
 
-              <div className="panel-row">
+              <div className="sk-panel-row" style={{paddingBottom: 14}}>
                 <div className="panel-column">
-                  <p>
-                  If you lose access to your device and your secret key, you will be unable to login to your account.
-                  If you enable Email Recovery, you can email Standard Notes from your account email to disable 2FA
-                  and allow you to sign back in to your account.
-                  </p>
+                  <div className="sk-p">
+                    If you lose access to your device and your secret key, you will be unable to login to your account.
+                    If you enable Email Recovery, you can email Standard Notes from your account email to disable 2FA
+                    and allow you to sign back in to your account.
+                  </div>
                   <br/>
-                  <p>
-                  If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up.
-                  For power users who maintain good data safety practices, we recommend keeping this option <i>disabled</i> for optimum security.
-                  </p>
+                  <div className="sk-p">
+                    If you leave this option unchecked, you will permanently lose access to your account if you lose your secret key and do not have it backed up.
+                    For power users who maintain good data safety practices, we recommend keeping this option <i>disabled</i> for optimum security.
+                  </div>
                 </div>
               </div>
             </div>
@@ -132,60 +135,65 @@ export default class NewMFA extends React.Component {
       ),
 
       (!this.state.confirm &&
-        <div className="panel-section no-border no-bottom-pad">
-          <p>
+        <div className="sk-panel-section no-border no-bottom-pad">
+          <div className="sk-p">
             2FA is currently disabled. You can enable 2FA by accepting the code below and pressing Enable.
-          </p>
+          </div>
         </div>
       ),
 
       (!this.state.confirm &&
 
-        <div className="panel-section">
-            <h1 className="panel-row outer-title"><strong>Enable two-factor authentication</strong></h1>
+        <div className="sk-panel-section">
+            <div className="sk-panel-section-outer-title"><strong>Enable two-factor authentication</strong></div>
 
-          <div className="panel-row justify-left align-top">
+          <div className="sk-panel-row justify-left align-top">
 
             <div className="panel-column">
               <QRCode value={url}/>
-              <div className="panel-row button-group stretch">
-                <div className="button info" onClick={this.install}>
-                  <div className="label">Enable</div>
+              <div className="sk-panel-row sk-button-group stretch">
+                <div className="sk-button info" onClick={this.install}>
+                  <div className="sk-label">Enable</div>
                 </div>
               </div>
             </div>
 
             <div className="panel-column right-section">
 
-              <p className="panel-row justify-left multi-label">
+              <div className="sk-p sk-panel-row justify-left multi-label">
                 Secret Key
-                <strong>{secret}</strong>
-              </p>
-              <p className="panel-row justify-left multi-label">
+                <span className="info sk-bold">{secret}</span>
+              </div>
+              <div className="sk-p sk-panel-row justify-left multi-label">
                 Current Token
-                <strong>{otp}</strong>
-              </p>
+                <span className="info sk-bold">{otp}</span>
+              </div>
 
-              <h2 className="panel-row">Instructions (read very carefully):</h2>
+              <div className="sk-panel-row" />
+              <div className="sk-h2 sk-bold">Instructions</div>
+              <div className="sk-h4 danger">Please read carefully.</div>
+              <div className="sk-panel-row" />
 
               <ol>
                 <li>
-                  <p>Scan the QR code in your authenticator app.</p>
+                  <div className="sk-p">Scan the QR code in your authenticator app.</div>
                 </li>
                 <li>
-                  <p>Ensure you see the code <strong>{otp}</strong> generated by the app.</p>
+                  <div className="sk-p">Ensure you see the code <strong>{otp}</strong> generated by the app.</div>
                 </li>
                 <li>
-                  <p>Save the <strong>Secret Key</strong> somewhere safe.</p>
-                  <p><a href="https://standardnotes.org/help/21/where-should-i-store-my-two-factor-authentication-secret-key" target="_blank" className="info">Key Storage Recommendations</a></p>
-                  <p>
+                  <div className="sk-p">Save the <strong>Secret Key</strong> somewhere safe.</div>
+                  <div className="sk-panel-row"/>
+                  <div className="sk-p"><a href="https://standardnotes.org/help/21/where-should-i-store-my-two-factor-authentication-secret-key" target="_blank" className="info">Key Storage Recommendations</a></div>
+                  <div className="sk-panel-row"/>
+                  <div className="sk-p">
                     <strong className="danger">Important: </strong>
                     Some apps, like Google Authenticator, do not back up and restore your secret keys if you lose your device or get a new one.
                     If you lose your Secret Key, you’ll be <strong className="danger">permanently locked out of your Standard Notes account.</strong>
-                  </p>
+                  </div>
                 </li>
                 <li>
-                  <p>Press <i>Enable</i>.</p>
+                  <div className="sk-p">Press <i>Enable</i>.</div>
                 </li>
               </ol>
 
