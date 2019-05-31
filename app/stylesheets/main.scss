@@ -18,8 +18,8 @@ body {
    box-sizing: border-box;
 }
 
-.left-section {
-
+.sn-component .sk-panel-row:not(:last-child) {
+  padding-bottom: 0 !important;
 }
 
 .right-section {

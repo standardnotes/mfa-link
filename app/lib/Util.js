@@ -31,6 +31,19 @@ export default class Util {
   static generateQrCodeUrl(secret) {
     return `otpauth://totp/2FA?secret=${secret}&issuer=Standard%20Notes`
   }
+
+  static saveFile(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
 }
 
 function dec2hex(s) { return (s < 15.5 ? '0' : '') + Math.round(s).toString(16); }
