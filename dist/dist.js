@@ -378,6 +378,20 @@ var Util = function () {
     value: function generateQrCodeUrl(secret) {
       return "otpauth://totp/2FA?secret=" + secret + "&issuer=Standard%20Notes";
     }
+  }, {
+    key: "saveFile",
+    value: function saveFile(filename, text) {
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+
+      element.style.display = 'none';
+      document.body.appendChild(element);
+
+      element.click();
+
+      document.body.removeChild(element);
+    }
   }]);
 
   return Util;
@@ -3850,6 +3864,10 @@ var NewMFA = function (_React$Component) {
       _this.setState({ showRecoveryDetails: !_this.state.showRecoveryDetails });
     };
 
+    _this.exportSecret = function () {
+      _Util2.default.saveFile("standardnotes_2fa_key.txt", _this.state.secret);
+    };
+
     _this.state = { secret: _Util2.default.generateSecretKey(), allowRecovery: true };
     setInterval(function () {
       var epoch = Math.round(new Date().getTime() / 1000.0);
@@ -4011,6 +4029,19 @@ var NewMFA = function (_React$Component) {
                   "Enable"
                 )
               )
+            ),
+            _react2.default.createElement(
+              "div",
+              { className: "sk-panel-row sk-button-group stretch" },
+              _react2.default.createElement(
+                "div",
+                { className: "sk-button warning", onClick: this.exportSecret },
+                _react2.default.createElement(
+                  "div",
+                  { className: "sk-label" },
+                  "Export Secret"
+                )
+              )
             )
           ),
           _react2.default.createElement(
@@ -4087,7 +4118,13 @@ var NewMFA = function (_React$Component) {
                     null,
                     "Secret Key"
                   ),
-                  " somewhere safe."
+                  " somewhere safe. You can export the Secret Key into a text file by choosing ",
+                  _react2.default.createElement(
+                    "i",
+                    null,
+                    "Export Secret"
+                  ),
+                  "."
                 ),
                 _react2.default.createElement("div", { className: "sk-panel-row" }),
                 _react2.default.createElement(

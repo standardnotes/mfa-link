@@ -15,6 +15,9 @@ body {
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
 
+.sn-component .sk-panel-row:not(:last-child) {
+  padding-bottom: 0 !important; }
+
 .right-section {
   padding-left: 20px; }
 
