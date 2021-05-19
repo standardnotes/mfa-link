@@ -85,13 +85,17 @@ export default class NewMFA extends React.Component {
 
           <form className="sk-panel-row panel-form" onSubmit={this.submitConfirmationForm}>
             <div className="panel-column stretch">
+              <label for="secret-key">Secret Key</label>
               <input
+                id="secret-key"
                 className="sk-input contrast"
                 placeholder="Enter Secret Key"
                 value={this.state.confirmKey}
                 onChange={this.handleKeyInputChange}
               />
+              <label for="current-token">Current Token</label>
               <input
+                id="current-token"
                 className="sk-input contrast"
                 placeholder="Enter Current Token"
                 value={this.state.confirmToken}
@@ -156,12 +160,12 @@ export default class NewMFA extends React.Component {
             <div className="panel-column">
               <QRCode value={url}/>
               <div className="sk-panel-row sk-button-group stretch">
-                <div className="sk-button info" onClick={this.install}>
+                <div className="sk-button success" onClick={this.install}>
                   <div className="sk-label">Enable</div>
                 </div>
               </div>
               <div className="sk-panel-row sk-button-group stretch">
-                <div className="sk-button warning" onClick={this.exportSecret}>
+                <div className="sk-button info" onClick={this.exportSecret}>
                   <div className="sk-label">Export Secret</div>
                 </div>
               </div>
@@ -179,8 +183,8 @@ export default class NewMFA extends React.Component {
               </div>
 
               <div className="sk-panel-row" />
-              <div className="sk-h2 sk-bold">Instructions</div>
-              <div className="sk-h4 danger">Please read carefully.</div>
+              <div className="sk-h2">Instructions</div>
+              <div className="sk-h4 sk-bold">Please read carefully.</div>
               <div className="sk-panel-row" />
 
               <ol>
@@ -196,9 +200,9 @@ export default class NewMFA extends React.Component {
                   <div className="sk-p"><a href="https://standardnotes.org/help/21/where-should-i-store-my-two-factor-authentication-secret-key" target="_blank" className="info">Key Storage Recommendations</a></div>
                   <div className="sk-panel-row"/>
                   <div className="sk-p">
-                    <strong className="danger">Important: </strong>
+                    <span className="sk-bold">Important: </span>
                     Some apps, like Google Authenticator, do not back up and restore your secret keys if you lose your device or get a new one.
-                    If you lose your Secret Key, you’ll be <strong className="danger">permanently locked out of your Standard Notes account.</strong>
+                    If you lose your Secret Key, you’ll be <span className="sk-bold">permanently locked out of your Standard Notes account.</span>
                   </div>
                 </li>
                 <li>
