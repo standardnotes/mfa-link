@@ -160,7 +160,7 @@ export default class NewMFA extends React.Component {
             <div className="panel-column">
               <QRCode value={url}/>
               <div className="sk-panel-row sk-button-group stretch">
-                <div className="sk-button success" onClick={this.install}>
+                <div className="sk-button info" onClick={this.install}>
                   <div className="sk-label">Enable</div>
                 </div>
               </div>
